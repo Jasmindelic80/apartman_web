@@ -1,0 +1,14 @@
+Django==5.0.4
+Pillow==10.3.0
+python-dotenv==1.0.1
+psycopg2-binary==2.9.9
+requests==2.31.0
+icalendar==5.0.12
+stripe==9.4.0
+django-allauth==0.63.3
+django-crispy-forms==2.1
+crispy-bootstrap5==2024.2
+django-modeltranslation==0.18.11
+whitenoise==6.6.0
+gunicorn==22.0.0
+django-imagekit==5.0

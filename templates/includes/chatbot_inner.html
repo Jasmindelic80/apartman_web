@@ -1,0 +1,251 @@
+{% load i18n %}
+{# Chatbot interni dijelovi - auto-detekcija jezika browsera #}
+
+<!-- Header -->
+<div style="background:#1a1a2e;color:white;padding:1rem 1.2rem;display:flex;justify-content:space-between;align-items:center">
+    <div>
+        <strong style="font-family:'Cormorant Garamond',serif;font-size:1.15rem">
+            <span id="chatbot-naslov">{{ chatbot_naslov }}</span>
+        </strong>
+        <div style="font-size:0.7rem;opacity:0.7;margin-top:0.2rem">
+            <span style="display:inline-block;width:8px;height:8px;background:#10b981;border-radius:50%;margin-right:0.4rem;animation:dot 1.5s infinite"></span>
+            <span id="chatbot-status">{{ chatbot_status }}</span>
+        </div>
+    </div>
+    {% if chatbot_postavke.nacin_prikaza == 'floating' or chatbot_postavke.nacin_prikaza == 'auto_otvori' or chatbot_postavke.nacin_prikaza == 'kombinacija' %}
+    <button onclick="toggleChat()" style="background:none;border:none;color:white;font-size:1.5rem;cursor:pointer;padding:0;line-height:1">×</button>
+    {% endif %}
+</div>
+
+<style>
+@keyframes dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+</style>
+
+<!-- Poruke -->
+<div id="chatbot-poruke" style="flex:1;overflow-y:auto;padding:1rem;background:#f8f6f0">
+    <div class="chat-poruka bot" id="prva-poruka">
+        <span id="chatbot-pozdrav">{{ chatbot_pozdrav }}</span>
+    </div>
+
+    <!-- Sugerirana pitanja -->
+    {% if chatbot_postavke.pokazi_sugerirana and sugerirana_pitanja %}
+    <div id="sugerirana-wrapper" style="margin-top:1rem">
+        <p id="popularna-label" style="font-size:0.72rem;color:#999;margin-bottom:0.5rem">
+            {{ chatbot_popularna_label }}
+        </p>
+        <div id="sugerirana-grid" style="display:flex;flex-wrap:wrap;gap:0.3rem">
+            {% for pitanje in sugerirana_pitanja %}
+            <span class="sugerirano-pitanje" onclick="postaviPitanje(this)">{{ pitanje }}</span>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Indikator tipkanja -->
+<div id="chatbot-tipka" style="display:none;padding:0 1rem 0.5rem">
+    <div class="tipka-anim">
+        <span></span><span></span><span></span>
+    </div>
+</div>
+
+<!-- Input -->
+<div style="display:flex;gap:0.5rem;padding:0.8rem;border-top:1px solid #eee;background:white">
+    <input type="text"
+           class="chatbot-input"
+           id="chatbot-input-field"
+           placeholder="Postavite pitanje..."
+           onkeypress="if(event.key==='Enter') posaljiPoruku(this)"
+           style="flex:1;border:1px solid #e0e0e0;padding:0.7rem 1rem;font-family:'Jost',sans-serif;font-size:0.88rem;outline:none">
+    <button onclick="posaljiPoruku(this.previousElementSibling)"
+            style="background:{{ chatbot_postavke.boja_dugmeta }};color:#1a1a2e;border:none;padding:0 1rem;cursor:pointer;font-size:1.1rem;font-weight:600">→</button>
+</div>
+
+<div style="font-size:0.62rem;text-align:center;color:#999;padding:0.4rem;background:white">
+    Powered by Gemini AI
+</div>
+
+<script>
+(function() {
+    let sesijaId = localStorage.getItem('chatbot_sesija') || null;
+
+    // ========== AUTO-DETEKCIJA JEZIKA BROWSERA ==========
+
+    // Lokalizacije svih tekstova
+    const LOKALIZACIJE = {
+        'bs': {
+            pozdrav: "Zdravo! 👋 Ja sam vaš AI asistent. Pitajte me bilo šta o apartmanima, lokaciji ili izletima u okolini!",
+            naslov: "AI Asistent",
+            status: "Online · Odgovara odmah",
+            popularna: "💡 Popularna pitanja:",
+            placeholder: "Postavite pitanje...",
+            pitanja: ["Koliko košta noćenje?", "Gdje se nalazi apartman?", "Koji je najbolji restoran u blizini?", "Kako daleko je Štrbački buk?", "Imate li parking?", "Šta posjetiti za vikend?"]
+        },
+        'hr': {
+            pozdrav: "Pozdrav! 👋 Ja sam vaš AI asistent. Pitajte me bilo što o apartmanima, lokaciji ili izletima u okolici!",
+            naslov: "AI Asistent",
+            status: "Online · Odgovara odmah",
+            popularna: "💡 Popularna pitanja:",
+            placeholder: "Postavite pitanje...",
+            pitanja: ["Koliko košta noćenje?", "Gdje se nalazi apartman?", "Koji je najbolji restoran u blizini?", "Kako daleko su Plitvička jezera?", "Imate li parking?", "Što posjetiti za vikend?"]
+        },
+        'en': {
+            pozdrav: "Hello! 👋 I'm your AI assistant. Ask me anything about the apartments, location, or trips in the area!",
+            naslov: "AI Assistant",
+            status: "Online · Responds instantly",
+            popularna: "💡 Popular questions:",
+            placeholder: "Ask a question...",
+            pitanja: ["How much is a night?", "Where is the apartment located?", "What's the best nearby restaurant?", "How far is Plitvice Lakes?", "Is there parking?", "What to visit for a weekend?"]
+        },
+        'de': {
+            pozdrav: "Hallo! 👋 Ich bin Ihr KI-Assistent. Fragen Sie mich alles über die Apartments, den Standort oder Ausflüge in der Umgebung!",
+            naslov: "KI-Assistent",
+            status: "Online · Antwortet sofort",
+            popularna: "💡 Häufige Fragen:",
+            placeholder: "Stellen Sie eine Frage...",
+            pitanja: ["Wie viel kostet eine Nacht?", "Wo befindet sich das Apartment?", "Welches ist das beste Restaurant in der Nähe?", "Wie weit sind die Plitvicer Seen?", "Gibt es einen Parkplatz?", "Was kann man am Wochenende besuchen?"]
+        },
+        'it': {
+            pozdrav: "Ciao! 👋 Sono il vostro assistente AI. Chiedetemi qualsiasi cosa sugli appartamenti, sulla posizione o sulle escursioni nella zona!",
+            naslov: "Assistente AI",
+            status: "Online · Risponde subito",
+            popularna: "💡 Domande popolari:",
+            placeholder: "Fai una domanda...",
+            pitanja: ["Quanto costa una notte?", "Dove si trova l'appartamento?", "Qual è il miglior ristorante vicino?", "Quanto distano i Laghi di Plitvice?", "C'è il parcheggio?", "Cosa visitare per un fine settimana?"]
+        },
+        'fr': {
+            pozdrav: "Bonjour! 👋 Je suis votre assistant IA. Demandez-moi tout sur les appartements, l'emplacement ou les excursions dans la région!",
+            naslov: "Assistant IA",
+            status: "En ligne · Répond immédiatement",
+            popularna: "💡 Questions populaires:",
+            placeholder: "Posez une question...",
+            pitanja: ["Combien coûte une nuit?", "Où se trouve l'appartement?", "Quel est le meilleur restaurant à proximité?", "À quelle distance sont les lacs de Plitvice?", "Y a-t-il un parking?", "Que visiter pour un week-end?"]
+        }
+    };
+
+    // Detektiraj jezik browsera klijenta
+    function detektirajBrowserJezik() {
+        const lang = (navigator.language || navigator.userLanguage || 'bs').toLowerCase();
+        const prvi = lang.substring(0, 2);
+
+        // Mapiranje
+        const mapa = {
+            'bs': 'bs', 'hr': 'bs', 'sr': 'bs',  // bošnjački/hrvatski/srpski → bs
+            'en': 'en', 'de': 'de', 'it': 'it', 'fr': 'fr',
+            'es': 'en', 'pt': 'en'  // fallback na engleski
+        };
+
+        return mapa[prvi] || 'bs';
+    }
+
+    // Postavi jezik na chatbot
+    let detektiraniJezik = detektirajBrowserJezik();
+
+    // Provjeri da li je vlasnik već postavio custom poruke u adminu
+    // (server šalje već lokalizovan tekst)
+    const serverLokalizacija = "{{ chatbot_jezik }}";
+
+    // Ako server već šalje lokalizovan tekst, koristi taj
+    // Inače koristi browser detekciju
+    let aktivniJezik = serverLokalizacija || detektiraniJezik;
+    const lok = LOKALIZACIJE[aktivniJezik] || LOKALIZACIJE['bs'];
+
+    // Postavi sve tekstove
+    function azurirajJezikInterface() {
+        const pozdrav = document.getElementById('chatbot-pozdrav');
+        const naslov = document.getElementById('chatbot-naslov');
+        const status = document.getElementById('chatbot-status');
+        const popularna = document.getElementById('popularna-label');
+        const input = document.getElementById('chatbot-input-field');
+        const sugerirana = document.getElementById('sugerirana-grid');
+
+        // Ako server šalje custom pozdrav (vlasnik je promijenio), ne mijenjaj
+        if (pozdrav && !pozdrav.dataset.custom) {
+            pozdrav.textContent = lok.pozdrav;
+        }
+        if (naslov) naslov.textContent = lok.naslov;
+        if (status) status.textContent = lok.status;
+        if (popularna) popularna.textContent = lok.popularna;
+        if (input) input.placeholder = lok.placeholder;
+
+        // Zamijeni sugerirana pitanja
+        if (sugerirana && lok.pitanja) {
+            sugerirana.innerHTML = '';
+            lok.pitanja.forEach(p => {
+                const span = document.createElement('span');
+                span.className = 'sugerirano-pitanje';
+                span.textContent = p;
+                span.onclick = function() { postaviPitanje(this); };
+                sugerirana.appendChild(span);
+            });
+        }
+    }
+
+    azurirajJezikInterface();
+
+    // ========== FUNKCIJE ==========
+
+    window.dodajChatPoruku = function(tekst, tip) {
+        const div = document.createElement('div');
+        div.className = 'chat-poruka ' + tip;
+        div.innerHTML = tekst.replace(/\n/g, '<br>');
+
+        const sug = document.getElementById('sugerirana-wrapper');
+        if (sug) sug.style.display = 'none';
+
+        const poruke = document.getElementById('chatbot-poruke');
+        poruke.appendChild(div);
+        poruke.scrollTop = poruke.scrollHeight;
+    };
+
+    window.postaviPitanje = function(el) {
+        const tekst = el.textContent.trim();
+        const input = document.getElementById('chatbot-input-field');
+        if (input) {
+            input.value = tekst;
+            posaljiPoruku(input);
+        }
+    };
+
+    window.posaljiPoruku = async function(input) {
+        const pitanje = input.value.trim();
+        if (!pitanje) return;
+
+        dodajChatPoruku(pitanje, 'korisnik');
+        input.value = '';
+        document.getElementById('chatbot-tipka').style.display = 'block';
+
+        try {
+            const res = await fetch('{% url "chatbot:api" %}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    pitanje,
+                    sesija: sesijaId,
+                    jezik: aktivniJezik  // šalji detektovan jezik backendu!
+                }),
+            });
+            const data = await res.json();
+
+            if (data.sesija) {
+                sesijaId = data.sesija;
+                localStorage.setItem('chatbot_sesija', sesijaId);
+            }
+
+            // Ažuriraj jezik ako je AI detektovao drugi
+            if (data.jezik && data.jezik !== aktivniJezik && LOKALIZACIJE[data.jezik]) {
+                aktivniJezik = data.jezik;
+            }
+
+            document.getElementById('chatbot-tipka').style.display = 'none';
+            dodajChatPoruku(data.odgovor, 'bot');
+        } catch (err) {
+            document.getElementById('chatbot-tipka').style.display = 'none';
+            dodajChatPoruku('Oprostite, došlo je do greške. Pokušajte ponovo!', 'bot');
+        }
+    };
+})();
+</script>

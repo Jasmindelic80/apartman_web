@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+{% block title %}Mapa okolice — {{ apartman.naziv }}{% endblock %}
+
+{% block extra_css %}
+<style>
+#google-mapa {
+    height: 600px;
+    width: 100%;
+}
+.info-panel {
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+    background: white;
+    padding: 1rem;
+    max-width: 280px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    z-index: 10;
+    display: none;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div style="background:var(--tamna);padding:4rem 0 2rem;text-align:center;color:white">
+    <p class="section-subtitle">Interaktivna mapa</p>
+    <h1 style="font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:300">Okolica apartmana</h1>
+</div>
+
+<!-- FILTERI -->
+<div style="background:#1a1a2e;padding:1rem 0;border-top:1px solid rgba(255,255,255,0.1)">
+    <div class="container d-flex flex-wrap gap-2 justify-content-center">
+        <a href="{% url 'apartman:okolica' %}" class="btn btn-sm {% if not odabrana_kategorija %}btn-warning{% else %}btn-outline-light{% endif %}"
+           style="font-size:0.75rem;border-radius:0;letter-spacing:0.1em">Sve</a>
+        {% for kat in kategorije %}
+        <a href="?kategorija={{ kat.id }}" class="btn btn-sm {% if odabrana_kategorija == kat.id|stringformat:'s' %}btn-warning{% else %}btn-outline-light{% endif %}"
+           style="font-size:0.75rem;border-radius:0;letter-spacing:0.1em">
+            {{ kat.ikona }} {{ kat.naziv }}
+        </a>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- MAPA -->
+<div style="position:relative">
+    <div id="google-mapa"></div>
+</div>
+
+<!-- LISTA ISPOD MAPE -->
+<div style="background:#f8f6f0;padding:3rem 0">
+    <div class="container">
+        <div class="row g-3">
+            {% for lok in lokacije %}
+            <div class="col-md-4 col-lg-3">
+                <div class="kartica p-3" style="cursor:pointer" onclick="focusMarker({{ lok.id }})">
+                    <div style="font-size:1.5rem;margin-bottom:0.5rem">{{ lok.kategorija.ikona|default:"📍" }}</div>
+                    <div style="font-family:'Cormorant Garamond',serif;font-size:1rem">{{ lok.naziv }}</div>
+                    <div style="font-size:0.78rem;color:#999">📍 {{ lok.udaljenost_km }} km</div>
+                    {% if lok.google_maps_link %}
+                    <a href="{{ lok.google_maps_link }}" target="_blank"
+                       style="font-size:0.72rem;color:#c9a84c;text-decoration:none" onclick="event.stopPropagation()">
+                        Otvori u Google Maps →
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const lokacije = {{ lokacije_json|safe }};
+const markers = {};
+
+function initMap() {
+    {% if apartman %}
+    const apartmanPos = { lat: {{ apartman.lat }}, lng: {{ apartman.lng }} };
+    {% else %}
+    const apartmanPos = { lat: 43.5, lng: 16.4 };
+    {% endif %}
+
+    const map = new google.maps.Map(document.getElementById("google-mapa"), {
+        zoom: 11,
+        center: apartmanPos,
+        styles: [
+            { featureType: "all", elementType: "geometry", stylers: [{ saturation: -20 }] },
+            { featureType: "water", stylers: [{ color: "#a8d5e2" }] },
+            { featureType: "road", elementType: "geometry", stylers: [{ color: "#ffffff" }] },
+        ]
+    });
+
+    // Marker za apartman
+    new google.maps.Marker({
+        position: apartmanPos,
+        map,
+        title: "{% if apartman %}{{ apartman.naziv }}{% else %}Apartman{% endif %}",
+        icon: {
+            url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="48" viewBox="0 0 40 48">
+                    <ellipse cx="20" cy="44" rx="8" ry="4" fill="rgba(0,0,0,0.2)"/>
+                    <path d="M20 0 C9 0 0 9 0 20 C0 34 20 48 20 48 S40 34 40 20 C40 9 31 0 20 0Z" fill="#1a1a2e"/>
+                    <text x="20" y="27" text-anchor="middle" font-size="18">🏠</text>
+                </svg>`),
+            scaledSize: new google.maps.Size(40, 48),
+        },
+        zIndex: 100,
+    });
+
+    // Markeri za lokacije
+    const infoWindow = new google.maps.InfoWindow();
+
+    lokacije.forEach(lok => {
+        const marker = new google.maps.Marker({
+            position: { lat: lok.lat, lng: lok.lng },
+            map,
+            title: lok.naziv,
+            label: {
+                text: lok.ikona,
+                fontSize: '18px',
+            },
+            icon: {
+                path: google.maps.SymbolPath.CIRCLE,
+                fillColor: lok.boja,
+                fillOpacity: 0.9,
+                strokeColor: 'white',
+                strokeWeight: 2,
+                scale: lok.preporuceno ? 14 : 11,
+            },
+        });
+
+        markers[lok.id] = { marker, map };
+
+        marker.addListener('click', () => {
+            infoWindow.setContent(`
+                <div style="font-family:'Jost',sans-serif;padding:0.5rem;max-width:220px">
+                    <div style="font-size:0.7rem;color:#c9a84c;text-transform:uppercase;letter-spacing:0.1em">
+                        ${lok.kategorija}
+                    </div>
+                    <strong style="font-size:1rem">${lok.naziv}</strong>
+                    <p style="font-size:0.8rem;color:#666;margin:0.4rem 0">${lok.kratki_opis}</p>
+                    <div style="font-size:0.75rem;color:#999">📍 ${lok.udaljenost} km od apartmana</div>
+                    ${lok.link ? `<a href="${lok.link}" target="_blank" style="font-size:0.75rem;color:#c9a84c">
+                        Otvori u Google Maps →</a>` : ''}
+                </div>
+            `);
+            infoWindow.open(map, marker);
+        });
+    });
+}
+
+function focusMarker(id) {
+    const m = markers[id];
+    if (m) {
+        m.map.panTo(m.marker.getPosition());
+        m.map.setZoom(15);
+        google.maps.event.trigger(m.marker, 'click');
+    }
+    document.getElementById('google-mapa').scrollIntoView({ behavior: 'smooth' });
+}
+</script>
+<script async src="https://maps.googleapis.com/maps/api/js?key={{ maps_key }}&callback=initMap&language=hr"></script>
+{% endblock %}

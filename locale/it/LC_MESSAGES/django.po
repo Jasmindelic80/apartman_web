@@ -1,0 +1,184 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: it\n"
+
+msgid "Apartman"
+msgstr "Appartamento"
+
+msgid "Okolica"
+msgstr "Dintorni"
+
+msgid "Mapa"
+msgstr "Mappa"
+
+msgid "Rezerviraj"
+msgstr "Prenota"
+
+msgid "Brze veze"
+msgstr "Link rapidi"
+
+msgid "Početna"
+msgstr "Home"
+
+msgid "Izleti i restorani"
+msgstr "Escursioni e ristoranti"
+
+msgid "Rezervacija"
+msgstr "Prenotazione"
+
+msgid "Kontakt"
+msgstr "Contatto"
+
+msgid "Sva prava pridržana"
+msgstr "Tutti i diritti riservati"
+
+msgid "Instalirajte aplikaciju"
+msgstr "Installa l'app"
+
+msgid "Brži pristup s vaše početne stranice"
+msgstr "Accesso più rapido dalla schermata principale"
+
+msgid "Instaliraj"
+msgstr "Installa"
+
+msgid "Dobrodošli"
+msgstr "Benvenuti"
+
+msgid "Rezerviraj odmah"
+msgstr "Prenota ora"
+
+msgid "Saznaj više"
+msgstr "Scopri di più"
+
+msgid "GOSTIJU"
+msgstr "OSPITI"
+
+msgid "SOBE"
+msgstr "CAMERE"
+
+msgid "PO NOĆI"
+msgstr "A NOTTE"
+
+msgid "O Apartmanu"
+msgstr "Sull'appartamento"
+
+msgid "Pogledaj sve detalje"
+msgstr "Vedi tutti i dettagli"
+
+msgid "Iskustva gostiju"
+msgstr "Esperienze degli ospiti"
+
+msgid "Što kažu naši gosti"
+msgstr "Cosa dicono i nostri ospiti"
+
+msgid "Provjerite dostupnost"
+msgstr "Verifica disponibilità"
+
+msgid "Rezervirajte Vaš boravak"
+msgstr "Prenota il tuo soggiorno"
+
+msgid "Provjeri dostupnost i rezerviraj"
+msgstr "Verifica e prenota"
+
+msgid "Direktna rezervacija"
+msgstr "Prenotazione diretta"
+
+msgid "Bez provizije · Direktno s vlasnikom"
+msgstr "Senza commissioni · Direttamente con il proprietario"
+
+msgid "Odaberite termine"
+msgstr "Seleziona le date"
+
+msgid "Datum dolaska"
+msgstr "Data di arrivo"
+
+msgid "Datum odlaska"
+msgstr "Data di partenza"
+
+msgid "Broj gostiju"
+msgstr "Numero di ospiti"
+
+msgid "Vaši podaci"
+msgstr "I tuoi dati"
+
+msgid "Ime"
+msgstr "Nome"
+
+msgid "Prezime"
+msgstr "Cognome"
+
+msgid "Email adresa"
+msgstr "Indirizzo email"
+
+msgid "Telefon / WhatsApp"
+msgstr "Telefono / WhatsApp"
+
+msgid "Napomene (opciono)"
+msgstr "Note (opzionale)"
+
+msgid "Pošalji upit za rezervaciju"
+msgstr "Invia richiesta di prenotazione"
+
+msgid "Cijena"
+msgstr "Prezzo"
+
+msgid "po noći"
+msgstr "a notte"
+
+msgid "Ukupno"
+msgstr "Totale"
+
+msgid "noći"
+msgstr "notti"
+
+msgid "Ili rezervirajte putem"
+msgstr "O prenota tramite"
+
+msgid "Otkrijte"
+msgstr "Scopri"
+
+msgid "Izleti i restorani u okolici"
+msgstr "Escursioni e ristoranti nelle vicinanze"
+
+msgid "Naši prijedlozi"
+msgstr "I nostri consigli"
+
+msgid "Sve"
+msgstr "Tutto"
+
+msgid "Sve lokacije"
+msgstr "Tutte le posizioni"
+
+msgid "Pogledaj sve na mapi"
+msgstr "Vedi tutto sulla mappa"
+
+msgid "Interaktivna mapa"
+msgstr "Mappa interattiva"
+
+msgid "Okolica apartmana"
+msgstr "Dintorni dell'appartamento"
+
+msgid "U blizini"
+msgstr "Nelle vicinanze"
+
+msgid "Restorani"
+msgstr "Ristoranti"
+
+msgid "Izleti i atrakcije"
+msgstr "Escursioni e attrazioni"
+
+msgid "Lokacija"
+msgstr "Posizione"
+
+msgid "Pravila kuće"
+msgstr "Regole della casa"
+
+msgid "Što je uključeno"
+msgstr "Cosa è incluso"
+
+msgid "O apartmanu"
+msgstr "Sull'appartamento"
+
+msgid "Detalji"
+msgstr "Dettagli"

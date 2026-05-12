@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% block title %}Izleti i restorani u okolici{% endblock %}
+
+{% block content %}
+
+<!-- HERO -->
+<div style="background:var(--tamna);padding:5rem 0 3rem;text-align:center;color:white">
+    <p class="section-subtitle">Otkrijte</p>
+    <h1 style="font-family:'Cormorant Garamond',serif;font-size:3rem;font-weight:300">Izleti i restorani u okolici</h1>
+    <div style="width:60px;height:1px;background:#c9a84c;margin:1.5rem auto"></div>
+    <p style="color:rgba(255,255,255,0.6);max-width:500px;margin:0 auto">
+        Naši prijedlozi za nezaboravan odmor
+    </p>
+</div>
+
+<div style="background:#f8f6f0;padding:4rem 0">
+<div class="container">
+
+    <!-- FILTERI -->
+    <div class="d-flex flex-wrap gap-2 justify-content-center mb-5">
+        <a href="{% url 'izleti:lista' %}"
+           class="{% if not odabrana_kategorija %}btn-zlatni{% else %}btn-outline-zlatni{% endif %}"
+           style="padding:0.6rem 1.5rem;font-size:0.78rem">
+            Sve
+        </a>
+        {% for kat in kategorije %}
+        <a href="?kategorija={{ kat.id }}"
+           class="{% if odabrana_kategorija == kat.id|stringformat:'s' %}btn-zlatni{% else %}btn-outline-zlatni{% endif %}"
+           style="padding:0.6rem 1.5rem;font-size:0.78rem">
+            {{ kat.ikona }} {{ kat.naziv }}
+        </a>
+        {% endfor %}
+    </div>
+
+    <!-- PREPORUČENO -->
+    {% if preporucene and not odabrana_kategorija %}
+    <div class="mb-5">
+        <div class="d-flex align-items-center gap-3 mb-4">
+            <div style="width:40px;height:1px;background:#c9a84c"></div>
+            <span style="font-size:0.75rem;letter-spacing:0.2em;text-transform:uppercase;color:#c9a84c">Naši prijedlozi</span>
+        </div>
+        <div class="row g-4">
+            {% for lok in preporucene %}
+            <div class="col-md-4">
+                <a href="{% url 'izleti:detalji' lok.pk %}" style="text-decoration:none;color:inherit">
+                    <div class="kartica" style="overflow:hidden;position:relative">
+                        <div style="position:absolute;top:1rem;right:1rem;background:#c9a84c;color:white;font-size:0.7rem;letter-spacing:0.1em;padding:0.3rem 0.8rem;z-index:1;text-transform:uppercase">
+                            ⭐ Preporučeno
+                        </div>
+                        {% if lok.slika %}
+                        <img src="{{ lok.slika.url }}" alt="{{ lok.naziv }}"
+                             style="width:100%;height:220px;object-fit:cover">
+                        {% else %}
+                        <div style="height:220px;background:linear-gradient(135deg,#e8d5a3,#c9a84c);display:flex;align-items:center;justify-content:center;font-size:3rem">
+                            {{ lok.kategorija.ikona|default:"📍" }}
+                        </div>
+                        {% endif %}
+                        <div class="p-4">
+                            <div style="font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;color:#c9a84c;margin-bottom:0.5rem">
+                                {{ lok.kategorija.naziv|default:"Lokacija" }}
+                            </div>
+                            <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:400;margin-bottom:0.5rem">
+                                {{ lok.naziv }}
+                            </h3>
+                            <p style="font-size:0.85rem;color:#666;line-height:1.6;margin-bottom:1rem">
+                                {{ lok.kratki_opis }}
+                            </p>
+                            <div class="d-flex gap-3" style="font-size:0.78rem;color:#999">
+                                <span>📍 {{ lok.udaljenost_km }} km</span>
+                                {% if lok.trajanje_min %}<span>🚗 {{ lok.trajanje_min }} min</span>{% endif %}
+                                {% if lok.cijena %}<span>💶 {{ lok.cijena }}</span>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- SVE LOKACIJE -->
+    <div>
+        {% if odabrana_kategorija %}
+        <div class="d-flex align-items-center gap-3 mb-4">
+            <div style="width:40px;height:1px;background:#c9a84c"></div>
+            <span style="font-size:0.75rem;letter-spacing:0.2em;text-transform:uppercase;color:#c9a84c">Rezultati</span>
+        </div>
+        {% else %}
+        <div class="d-flex align-items-center gap-3 mb-4">
+            <div style="width:40px;height:1px;background:#c9a84c"></div>
+            <span style="font-size:0.75rem;letter-spacing:0.2em;text-transform:uppercase;color:#c9a84c">Sve lokacije</span>
+        </div>
+        {% endif %}
+
+        <div class="row g-3">
+            {% for lok in lokacije %}
+            {% if not lok.preporuceno or odabrana_kategorija %}
+            <div class="col-md-6 col-lg-4">
+                <a href="{% url 'izleti:detalji' lok.pk %}" style="text-decoration:none;color:inherit">
+                    <div class="kartica d-flex gap-3 p-3 align-items-center">
+                        <div style="width:70px;height:70px;flex-shrink:0;background:{{ lok.kategorija.boja|default:'#3b82f6' }}22;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem">
+                            {{ lok.kategorija.ikona|default:"📍" }}
+                        </div>
+                        <div>
+                            <div style="font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:#c9a84c">
+                                {{ lok.kategorija.naziv|default:"" }}
+                            </div>
+                            <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:400">
+                                {{ lok.naziv }}
+                            </div>
+                            <div style="font-size:0.78rem;color:#999">
+                                📍 {{ lok.udaljenost_km }} km
+                                {% if lok.cijena %} · {{ lok.cijena }}{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endif %}
+            {% empty %}
+            <div class="col-12 text-center py-5">
+                <p style="color:#999">Nema lokacija u ovoj kategoriji.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- LINK NA MAPU -->
+    <div class="text-center mt-5">
+        <a href="{% url 'apartman:okolica' %}" class="btn-zlatni">
+            🗺️ Pogledaj sve na mapi
+        </a>
+    </div>
+
+</div>
+</div>
+{% endblock %}

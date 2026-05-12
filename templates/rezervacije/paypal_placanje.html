@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{% trans "Plaćanje" %} — {{ rezervacija.apartman.naziv }}{% endblock %}
+
+{% block content %}
+<div style="background:#f8f6f0;min-height:80vh;padding:5rem 0">
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+
+            <div class="text-center mb-4">
+                <p class="section-subtitle">{% trans "Sigurno plaćanje" %}</p>
+                <h1 class="section-title">{% trans "Plaćanje rezervacije" %}</h1>
+                <div class="divider-zlatni"></div>
+            </div>
+
+            <!-- Sažetak rezervacije -->
+            <div style="background:white;padding:2rem;margin-bottom:1.5rem;box-shadow:0 4px 30px rgba(0,0,0,0.08)">
+                <h5 style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid #eee">
+                    📋 {% trans "Sažetak rezervacije" %}
+                </h5>
+
+                <table style="width:100%;font-size:0.92rem">
+                    <tr>
+                        <td style="padding:0.5rem 0;color:#777">{% trans "Apartman" %}</td>
+                        <td style="padding:0.5rem 0;text-align:right"><strong>{{ rezervacija.apartman.naziv }}</strong></td>
+                    </tr>
+                    <tr>
+                        <td style="padding:0.5rem 0;color:#777">{% trans "Gost" %}</td>
+                        <td style="padding:0.5rem 0;text-align:right">{{ rezervacija.ime }} {{ rezervacija.prezime }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:0.5rem 0;color:#777">{% trans "Datumi" %}</td>
+                        <td style="padding:0.5rem 0;text-align:right">{{ rezervacija.datum_dolaska|date:"d.m.Y" }} → {{ rezervacija.datum_odlaska|date:"d.m.Y" }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:0.5rem 0;color:#777">{% trans "Broj noći" %}</td>
+                        <td style="padding:0.5rem 0;text-align:right">{{ rezervacija.broj_noci }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:0.5rem 0;color:#777">{% trans "Cijena po noći" %}</td>
+                        <td style="padding:0.5rem 0;text-align:right">{{ rezervacija.cijena_po_noci }}€</td>
+                    </tr>
+                    <tr style="border-top:2px solid #c9a84c">
+                        <td style="padding:1rem 0;font-size:1.1rem"><strong>{% trans "Ukupno za platiti" %}</strong></td>
+                        <td style="padding:1rem 0;text-align:right">
+                            <strong style="font-size:1.5rem;color:#c9a84c;font-family:'Cormorant Garamond',serif">
+                                {{ rezervacija.ukupno }}€
+                            </strong>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- PayPal dugmad -->
+            <div style="background:white;padding:2rem;box-shadow:0 4px 30px rgba(0,0,0,0.08)">
+                <h5 style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;margin-bottom:0.5rem">
+                    💳 {% trans "Odaberite način plaćanja" %}
+                </h5>
+                <p style="color:#888;font-size:0.85rem;margin-bottom:1.5rem">
+                    {% trans "Sigurno plaćanje putem PayPal-a — uključuje i kreditne kartice." %}
+                </p>
+
+                <div id="paypal-button-container"></div>
+
+                <div id="paypal-poruka" style="display:none;text-align:center;margin-top:1rem;padding:1.5rem;border-radius:0"></div>
+
+                <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid #eee;font-size:0.78rem;color:#999;text-align:center">
+                    🔒 {% trans "Vaše podatke o kartici nikad ne pohranjujemo. Plaćanje obrađuje PayPal." %}
+                </div>
+            </div>
+
+            <!-- Alternative -->
+            <div class="text-center mt-4">
+                <p style="color:#888;font-size:0.85rem">
+                    {% trans "Imate problema s plaćanjem?" %}
+                    <a href="mailto:info@apartman.hr" style="color:#c9a84c">{% trans "Kontaktirajte nas" %}</a>
+                </p>
+            </div>
+
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://www.paypal.com/sdk/js?client-id={{ paypal_client_id }}&currency=EUR&locale={{ LANGUAGE_CODE }}_HR"></script>
+
+<script>
+const REZERVACIJA_UUID = "{{ rezervacija.uuid }}";
+
+paypal.Buttons({
+    style: {
+        layout: 'vertical',
+        color: 'gold',
+        shape: 'rect',
+        label: 'paypal',
+        height: 50,
+    },
+
+    // 1. Kreiraj order
+    createOrder: async function() {
+        const response = await fetch(`/rezervacije/paypal/kreiraj/${REZERVACIJA_UUID}/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+        });
+        const data = await response.json();
+        return data.orderID;
+    },
+
+    // 2. Plaćanje odobreno → naplati
+    onApprove: async function(data) {
+        prikaziPoruku('⏳ Obrađujemo plaćanje...', 'info');
+
+        const response = await fetch(`/rezervacije/paypal/potvrdi/${REZERVACIJA_UUID}/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ orderID: data.orderID }),
+        });
+        const result = await response.json();
+
+        if (result.status === 'success') {
+            prikaziPoruku('✅ Plaćanje uspješno! Preusmjeravamo vas...', 'uspjeh');
+            setTimeout(() => {
+                window.location.href = `/rezervacije/potvrda/${REZERVACIJA_UUID}/?paid=1`;
+            }, 2000);
+        } else {
+            prikaziPoruku('❌ Greška pri plaćanju. Pokušajte ponovo!', 'greska');
+        }
+    },
+
+    onError: function(err) {
+        console.error('PayPal greška:', err);
+        prikaziPoruku('❌ Greška pri plaćanju. Pokušajte ponovo ili nas kontaktirajte!', 'greska');
+    },
+
+    onCancel: function() {
+        prikaziPoruku('Plaćanje otkazano. Možete pokušati ponovo bilo kada.', 'info');
+    },
+
+}).render('#paypal-button-container');
+
+function prikaziPoruku(tekst, tip) {
+    const div = document.getElementById('paypal-poruka');
+    div.style.display = 'block';
+    div.innerHTML = tekst;
+
+    if (tip === 'uspjeh') {
+        div.style.background = '#d1fae5';
+        div.style.color = '#065f46';
+        div.style.borderLeft = '3px solid #10b981';
+    } else if (tip === 'greska') {
+        div.style.background = '#fee2e2';
+        div.style.color = '#991b1b';
+        div.style.borderLeft = '3px solid #ef4444';
+    } else {
+        div.style.background = '#fef3c7';
+        div.style.color = '#92400e';
+        div.style.borderLeft = '3px solid #f59e0b';
+    }
+}
+</script>
+{% endblock %}

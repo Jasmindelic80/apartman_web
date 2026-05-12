@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>PWA Icon Generator</title>
+<style>
+body { font-family: Arial; padding: 2rem; background: #f5f5f5; }
+.icon-preview { display: inline-block; margin: 1rem; text-align: center; }
+canvas { border: 1px solid #ddd; }
+button { padding: 0.8rem 2rem; background: #c9a84c; border: none; cursor: pointer; font-size: 1rem; margin-right: 0.5rem; }
+input { padding: 0.5rem; font-size: 1rem; margin-right: 0.5rem; width: 200px; }
+</style>
+</head>
+<body>
+
+<h1>🎨 PWA Icon Generator</h1>
+<p>Generiraj ikone za apartman aplikaciju. Otvori ovaj fajl u browseru, podesi i klikni "Preuzmi".</p>
+
+<div>
+    <input type="text" id="text" value="A" maxlength="2" placeholder="Slovo ili emoji">
+    <input type="color" id="bg" value="#1a1a2e">
+    <input type="color" id="fg" value="#c9a84c">
+    <button onclick="generiraj()">🎨 Generiraj</button>
+</div>
+
+<div style="margin-top:2rem">
+    <div class="icon-preview">
+        <canvas id="icon192" width="192" height="192"></canvas>
+        <div><button onclick="preuzmi(192)">⬇ icon-192.png</button></div>
+    </div>
+    <div class="icon-preview">
+        <canvas id="icon512" width="512" height="512"></canvas>
+        <div><button onclick="preuzmi(512)">⬇ icon-512.png</button></div>
+    </div>
+</div>
+
+<p style="margin-top:2rem;color:#666">
+    📁 Preuzete fajlove stavi u: <code>static/icons/</code>
+</p>
+
+<script>
+function generiraj() {
+    [192, 512].forEach(velicina => {
+        const canvas = document.getElementById('icon' + velicina);
+        const ctx = canvas.getContext('2d');
+        const text = document.getElementById('text').value || 'A';
+        const bg = document.getElementById('bg').value;
+        const fg = document.getElementById('fg').value;
+
+        // Pozadina
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, velicina, velicina);
+
+        // Slovo / emoji
+        ctx.fillStyle = fg;
+        ctx.font = `${velicina * 0.5}px Georgia, serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(text, velicina / 2, velicina / 2);
+
+        // Border
+        ctx.strokeStyle = fg;
+        ctx.lineWidth = velicina * 0.02;
+        ctx.strokeRect(velicina * 0.08, velicina * 0.08, velicina * 0.84, velicina * 0.84);
+    });
+}
+
+function preuzmi(velicina) {
+    const canvas = document.getElementById('icon' + velicina);
+    const link = document.createElement('a');
+    link.download = `icon-${velicina}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+}
+
+generiraj();
+</script>
+</body>
+</html>

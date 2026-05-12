@@ -1,0 +1,79 @@
+{% load i18n %}
+<!-- ANALYTICS & TRACKING - Dodaj u <head> ili na kraj <body> u base.html -->
+
+<!-- ===== GOOGLE ANALYTICS 4 ===== -->
+{% if GA_ID %}
+<script async src="https://www.googletagmanager.com/gtag/js?id={{ GA_ID }}"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', '{{ GA_ID }}', {
+    'send_page_view': true,
+    'anonymize_ip': true
+  });
+
+  // Custom events
+  function trackRezervacija(apartman) {
+    gtag('event', 'rezervacija_pokušana', {
+      'event_category': 'engagement',
+      'event_label': apartman
+    });
+  }
+
+  function trackChatbot() {
+    gtag('event', 'chatbot_otvoren', {
+      'event_category': 'engagement'
+    });
+  }
+
+  function trackJezik(jezik) {
+    gtag('event', 'promjena_jezika', {
+      'event_category': 'engagement',
+      'event_label': jezik
+    });
+  }
+</script>
+{% endif %}
+
+<!-- ===== FACEBOOK PIXEL ===== -->
+{% if FACEBOOK_PIXEL %}
+<script>
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window, document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '{{ FACEBOOK_PIXEL }}');
+  fbq('track', 'PageView');
+</script>
+<noscript>
+  <img height="1" width="1" style="display:none"
+       src="https://www.facebook.com/tr?id={{ FACEBOOK_PIXEL }}&ev=PageView&noscript=1"/>
+</noscript>
+{% endif %}
+
+<!-- ===== INTERNI TRACKING (radi i bez GA) ===== -->
+<script>
+// Snimaj statistiku u našu bazu
+(function() {
+    if (sessionStorage.getItem('tracked')) return;
+
+    fetch('/marketing/track/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
+        },
+        body: JSON.stringify({
+            stranica: window.location.pathname,
+            referrer: document.referrer
+        })
+    }).catch(() => {});
+
+    sessionStorage.setItem('tracked', '1');
+})();
+</script>

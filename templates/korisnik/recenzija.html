@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Ostavi recenziju{% endblock %}
+
+{% block content %}
+<div style="background:#f8f6f0;min-height:70vh;padding:5rem 0">
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div style="background:white;padding:3rem;box-shadow:0 4px 30px rgba(0,0,0,0.08)">
+                <p class="section-subtitle">Vaše iskustvo</p>
+                <h2 class="section-title">Ostavi recenziju</h2>
+                <div class="divider-zlatni" style="margin-left:0"></div>
+                <p style="color:#666;font-size:0.88rem;margin-bottom:2rem">
+                    {{ rezervacija.apartman.naziv }} · {{ rezervacija.datum_dolaska|date:"d.m.Y" }}
+                </p>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label style="font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;color:#888;display:block;margin-bottom:0.8rem">
+                            Ocjena
+                        </label>
+                        <div class="d-flex gap-2">
+                            {% for i in "12345" %}
+                            <label style="cursor:pointer">
+                                <input type="radio" name="ocjena" value="{{ forloop.counter }}"
+                                       style="display:none" {% if forloop.counter == 5 %}checked{% endif %}>
+                                <span class="zvjezdica" style="font-size:2rem">⭐</span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label style="font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;color:#888;display:block;margin-bottom:0.5rem">
+                            Vaš komentar
+                        </label>
+                        <textarea name="komentar" rows="5" required
+                                  style="width:100%;border:1px solid #e0e0e0;padding:1rem;font-family:'Jost',sans-serif;font-size:0.9rem;resize:vertical"
+                                  placeholder="Opišite Vaš boravak..."></textarea>
+                    </div>
+                    <button type="submit" class="btn-zlatni w-100" style="padding:1rem">
+                        Pošalji recenziju
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}

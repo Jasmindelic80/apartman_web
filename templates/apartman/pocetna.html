@@ -1,0 +1,248 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{% trans "Naši apartmani" %}{% endblock %}
+
+{% block content %}
+
+<!-- HERO -->
+<section style="background:linear-gradient(135deg,#1a1a2e 0%,#2d2d44 100%);padding:6rem 0 4rem;text-align:center;color:white">
+    <div class="container">
+        <p class="section-subtitle" style="color:#c9a84c">✦ {% trans "Dobrodošli" %} ✦</p>
+        <h1 style="font-family:'Cormorant Garamond',serif;font-size:clamp(2.5rem,5vw,4rem);font-weight:300;margin-bottom:1rem">
+            {% trans "Naši apartmani" %}
+        </h1>
+        <div style="width:60px;height:1px;background:#c9a84c;margin:1.5rem auto"></div>
+        <p style="font-size:1.05rem;opacity:0.85;max-width:600px;margin:0 auto">
+            {% trans "Odaberite svoj savršeni odmor — pažljivo birani apartmani s vrhunskom uslugom." %}
+        </p>
+    </div>
+</section>
+
+<!-- LISTA APARTMANA -->
+<section style="padding:5rem 0;background:#f8f6f0">
+<div class="container">
+    {% if apartmani %}
+    <div class="row g-4">
+        {% for apartman in apartmani %}
+        <div class="col-md-6 col-lg-{% if apartmani.count == 1 %}12{% elif apartmani.count == 2 %}6{% else %}4{% endif %}">
+            <div class="kartica-apartman" onclick="window.location='{% url 'apartman:detalji' apartman.pk %}'">
+                <!-- SLIKA -->
+                <div class="apartman-slika">
+                    {% with naslovna=apartman.get_naslovna_slika %}
+                        {% if naslovna %}
+                        <img src="{{ naslovna.slika.url }}" alt="{{ apartman.naziv }}">
+                        {% else %}
+                        <div class="placeholder-slika">🏠</div>
+                        {% endif %}
+                    {% endwith %}
+
+                    <!-- Cijena badge -->
+                    <div class="cijena-badge">
+                        <span style="font-size:0.7rem">{% trans "od" %}</span>
+                        <strong>{{ apartman.cijena_po_noci }}€</strong>
+                        <span style="font-size:0.7rem">/{% trans "noć" %}</span>
+                    </div>
+                </div>
+
+                <!-- INFO -->
+                <div class="apartman-info">
+                    <p class="apartman-lokacija">
+                        📍 {{ apartman.grad }}
+                    </p>
+                    <h3 class="apartman-naziv">{{ apartman.naziv }}</h3>
+                    {% if apartman.podnaslov %}
+                    <p class="apartman-podnaslov">{{ apartman.podnaslov }}</p>
+                    {% endif %}
+
+                    <!-- Brzi info -->
+                    <div class="apartman-detalji">
+                        <span>👥 {{ apartman.kapacitet }}</span>
+                        <span>🛏️ {{ apartman.spavace_sobe }}</span>
+                        <span>🚿 {{ apartman.kupaonice }}</span>
+                    </div>
+
+                    <!-- Amenities preview -->
+                    {% if apartman.amenities.all %}
+                    <div class="apartman-amenities">
+                        {% for a in apartman.amenities.all|slice:":4" %}
+                        <span class="amenity-pill">{{ a.get_ikona_display|slice:":2" }}</span>
+                        {% endfor %}
+                        {% if apartman.amenities.count > 4 %}
+                        <span class="amenity-pill">+{{ apartman.amenities.count|add:"-4" }}</span>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    <!-- CTA -->
+                    <div class="apartman-cta">
+                        <span class="apartman-link">{% trans "Pogledaj detalje" %} →</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center" style="padding:4rem 0">
+        <h3 style="font-family:'Cormorant Garamond',serif">{% trans "Apartmani uskoro!" %}</h3>
+        <p style="color:#888">{% trans "Trenutno radimo na unosu apartmana." %}</p>
+    </div>
+    {% endif %}
+</div>
+</section>
+
+<!-- RECENZIJE -->
+{% if recenzije %}
+<section style="padding:5rem 0;background:white">
+    <div class="container">
+        <div class="text-center mb-5">
+            <p class="section-subtitle">{% trans "Iskustva gostiju" %}</p>
+            <h2 class="section-title">{% trans "Što kažu naši gosti" %}</h2>
+            <div class="divider-zlatni"></div>
+        </div>
+        <div class="row g-4">
+            {% for rec in recenzije %}
+            <div class="col-md-4">
+                <div class="kartica p-4" style="height:100%">
+                    <div style="color:#c9a84c;font-size:1.1rem;margin-bottom:1rem">
+                        {% for i in "12345" %}{% if forloop.counter <= rec.ocjena %}⭐{% endif %}{% endfor %}
+                    </div>
+                    <p style="font-size:0.9rem;line-height:1.8;color:#555;font-style:italic">
+                        "{{ rec.komentar|truncatechars:160 }}"
+                    </p>
+                    <div style="border-top:1px solid #eee;margin-top:1rem;padding-top:1rem;font-size:0.82rem">
+                        <strong>{{ rec.ime_gosta }}</strong>
+                        <span style="color:#999;margin-left:0.5rem">{{ rec.drzava }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<style>
+.kartica-apartman {
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s;
+    height: 100%;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+    overflow: hidden;
+}
+.kartica-apartman:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+}
+
+.apartman-slika {
+    position: relative;
+    height: 280px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #e8d5a3, #c9a84c);
+}
+.apartman-slika img {
+    width: 100%; height: 100%; object-fit: cover;
+    transition: transform 0.5s;
+}
+.kartica-apartman:hover .apartman-slika img {
+    transform: scale(1.05);
+}
+.placeholder-slika {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 5rem;
+    color: white;
+}
+
+.cijena-badge {
+    position: absolute;
+    top: 1rem; right: 1rem;
+    background: rgba(26, 26, 46, 0.95);
+    color: #c9a84c;
+    padding: 0.5rem 1rem;
+    backdrop-filter: blur(10px);
+    text-align: center;
+}
+.cijena-badge strong {
+    display: block;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    font-weight: 400;
+}
+
+.apartman-info { padding: 1.5rem; }
+
+.apartman-lokacija {
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #c9a84c;
+    margin-bottom: 0.5rem;
+}
+
+.apartman-naziv {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.6rem;
+    font-weight: 400;
+    margin-bottom: 0.4rem;
+    color: #1a1a2e;
+}
+
+.apartman-podnaslov {
+    font-size: 0.88rem;
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+}
+
+.apartman-detalji {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.85rem;
+    color: #555;
+    padding: 0.8rem 0;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 1rem;
+}
+
+.apartman-amenities {
+    display: flex;
+    gap: 0.4rem;
+    margin-bottom: 1.2rem;
+    flex-wrap: wrap;
+}
+
+.amenity-pill {
+    background: #f8f6f0;
+    padding: 0.3rem 0.7rem;
+    font-size: 0.78rem;
+    border-radius: 0;
+}
+
+.apartman-cta {
+    display: flex;
+    justify-content: flex-end;
+    border-top: 1px solid #eee;
+    padding-top: 1rem;
+}
+
+.apartman-link {
+    font-size: 0.78rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #c9a84c;
+    font-weight: 500;
+    transition: gap 0.3s;
+}
+
+.kartica-apartman:hover .apartman-link {
+    color: #1a1a2e;
+}
+</style>
+{% include 'includes/newsletter.html' %}
+{% endblock %}

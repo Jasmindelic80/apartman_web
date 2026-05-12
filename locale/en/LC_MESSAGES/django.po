@@ -1,0 +1,184 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: en\n"
+
+msgid "Apartman"
+msgstr "Apartment"
+
+msgid "Okolica"
+msgstr "Surroundings"
+
+msgid "Mapa"
+msgstr "Map"
+
+msgid "Rezerviraj"
+msgstr "Book Now"
+
+msgid "Brze veze"
+msgstr "Quick Links"
+
+msgid "Početna"
+msgstr "Home"
+
+msgid "Izleti i restorani"
+msgstr "Trips and Restaurants"
+
+msgid "Rezervacija"
+msgstr "Reservation"
+
+msgid "Kontakt"
+msgstr "Contact"
+
+msgid "Sva prava pridržana"
+msgstr "All rights reserved"
+
+msgid "Instalirajte aplikaciju"
+msgstr "Install the app"
+
+msgid "Brži pristup s vaše početne stranice"
+msgstr "Faster access from your home screen"
+
+msgid "Instaliraj"
+msgstr "Install"
+
+msgid "Dobrodošli"
+msgstr "Welcome"
+
+msgid "Rezerviraj odmah"
+msgstr "Book now"
+
+msgid "Saznaj više"
+msgstr "Learn more"
+
+msgid "GOSTIJU"
+msgstr "GUESTS"
+
+msgid "SOBE"
+msgstr "ROOMS"
+
+msgid "PO NOĆI"
+msgstr "PER NIGHT"
+
+msgid "O Apartmanu"
+msgstr "About the Apartment"
+
+msgid "Pogledaj sve detalje"
+msgstr "See all details"
+
+msgid "Iskustva gostiju"
+msgstr "Guest experiences"
+
+msgid "Što kažu naši gosti"
+msgstr "What our guests say"
+
+msgid "Provjerite dostupnost"
+msgstr "Check availability"
+
+msgid "Rezervirajte Vaš boravak"
+msgstr "Book your stay"
+
+msgid "Provjeri dostupnost i rezerviraj"
+msgstr "Check availability and book"
+
+msgid "Direktna rezervacija"
+msgstr "Direct booking"
+
+msgid "Bez provizije · Direktno s vlasnikom"
+msgstr "No commission · Direct with owner"
+
+msgid "Odaberite termine"
+msgstr "Select dates"
+
+msgid "Datum dolaska"
+msgstr "Arrival date"
+
+msgid "Datum odlaska"
+msgstr "Departure date"
+
+msgid "Broj gostiju"
+msgstr "Number of guests"
+
+msgid "Vaši podaci"
+msgstr "Your details"
+
+msgid "Ime"
+msgstr "First name"
+
+msgid "Prezime"
+msgstr "Last name"
+
+msgid "Email adresa"
+msgstr "Email address"
+
+msgid "Telefon / WhatsApp"
+msgstr "Phone / WhatsApp"
+
+msgid "Napomene (opciono)"
+msgstr "Notes (optional)"
+
+msgid "Pošalji upit za rezervaciju"
+msgstr "Send booking request"
+
+msgid "Cijena"
+msgstr "Price"
+
+msgid "po noći"
+msgstr "per night"
+
+msgid "Ukupno"
+msgstr "Total"
+
+msgid "noći"
+msgstr "nights"
+
+msgid "Ili rezervirajte putem"
+msgstr "Or book via"
+
+msgid "Otkrijte"
+msgstr "Discover"
+
+msgid "Izleti i restorani u okolici"
+msgstr "Trips and restaurants nearby"
+
+msgid "Naši prijedlozi"
+msgstr "Our suggestions"
+
+msgid "Sve"
+msgstr "All"
+
+msgid "Sve lokacije"
+msgstr "All locations"
+
+msgid "Pogledaj sve na mapi"
+msgstr "View all on map"
+
+msgid "Interaktivna mapa"
+msgstr "Interactive map"
+
+msgid "Okolica apartmana"
+msgstr "Apartment surroundings"
+
+msgid "U blizini"
+msgstr "Nearby"
+
+msgid "Restorani"
+msgstr "Restaurants"
+
+msgid "Izleti i atrakcije"
+msgstr "Trips and attractions"
+
+msgid "Lokacija"
+msgstr "Location"
+
+msgid "Pravila kuće"
+msgstr "House rules"
+
+msgid "Što je uključeno"
+msgstr "What's included"
+
+msgid "O apartmanu"
+msgstr "About the apartment"
+
+msgid "Detalji"
+msgstr "Details"

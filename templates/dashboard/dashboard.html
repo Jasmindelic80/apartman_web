@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard — {{ apartman.naziv }}{% endblock %}
+
+{% block extra_css %}
+<style>
+.stat-kartica {
+    background: white;
+    padding: 1.8rem;
+    border-left: 3px solid var(--zlatna);
+    box-shadow: 0 2px 15px rgba(0,0,0,0.06);
+}
+.stat-broj {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.8rem;
+    font-weight: 300;
+    color: var(--tamna);
+    line-height: 1;
+}
+.stat-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #999;
+    margin-top: 0.4rem;
+}
+.rezervacija-red {
+    border-left: 3px solid #e0e0e0;
+    padding: 1rem 1.2rem;
+    background: white;
+    margin-bottom: 0.5rem;
+    transition: border-color 0.2s;
+}
+.rezervacija-red:hover { border-left-color: var(--zlatna); }
+.status-pill {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.7rem;
+    border-radius: 20px;
+    font-weight: 500;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="background:#f8f6f0;min-height:100vh;padding:3rem 0">
+<div class="container">
+
+    <!-- Naslov -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <p class="section-subtitle mb-1">Upravljanje</p>
+            <h1 class="section-title mb-0">Dashboard</h1>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'dashboard:kalendar' %}" class="btn-outline-zlatni" style="padding:0.6rem 1.2rem;font-size:0.8rem">
+                📅 Kalendar rezervacija
+            </a>
+            <a href="/admin/" class="btn-zlatni" style="padding:0.6rem 1.2rem;font-size:0.8rem">
+                ⚙️ Admin panel
+            </a>
+        </div>
+    </div>
+
+    <!-- STAT KARTICE -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="stat-kartica">
+                <div class="stat-broj">{{ aktivne_rezervacije }}</div>
+                <div class="stat-label">Aktivne rezervacije</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-kartica" style="border-color:#f59e0b">
+                <div class="stat-broj" style="color:#f59e0b">{{ cekaju_potvrdu }}</div>
+                <div class="stat-label">Čekaju potvrdu</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-kartica" style="border-color:#10b981">
+                <div class="stat-broj" style="color:#10b981">{{ prihodi_godina }}€</div>
+                <div class="stat-label">Prihodi ove godine</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-kartica" style="border-color:#3b82f6">
+                <div class="stat-broj" style="color:#3b82f6">{{ popunjenost }}%</div>
+                <div class="stat-label">Popunjenost ovog mj.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- GRAFIKON PRIHODA -->
+        <div class="col-lg-8">
+            <div style="background:white;padding:1.8rem;box-shadow:0 2px 15px rgba(0,0,0,0.06)">
+                <h5 style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;margin-bottom:1.5rem">
+                    Prihodi po mjesecima
+                </h5>
+                <canvas id="prihodiChart" height="100"></canvas>
+            </div>
+        </div>
+
+        <!-- BRZE AKCIJE -->
+        <div class="col-lg-4">
+            <div style="background:var(--tamna);padding:1.8rem;color:white">
+                <h5 style="font-family:'Cormorant Garamond',serif;color:#c9a84c;margin-bottom:1.5rem">
+                    Brze akcije
+                </h5>
+                <div class="d-flex flex-column gap-2">
+                    <a href="/admin/rezervacije/rezervacija/add/" class="btn-outline-zlatni text-center" style="padding:0.7rem">
+                        ➕ Nova rezervacija
+                    </a>
+                    <a href="/admin/rezervacije/rezervacija/?status__exact=cekanje" class="btn-outline-zlatni text-center" style="padding:0.7rem;border-color:rgba(255,255,255,0.3);color:white">
+                        ⏳ Pregled upita ({{ cekaju_potvrdu }})
+                    </a>
+                    <a href="/admin/apartman/recenzija/?odobreno__exact=0" class="btn-outline-zlatni text-center" style="padding:0.7rem;border-color:rgba(255,255,255,0.3);color:white">
+                        ⭐ Odobri recenzije
+                    </a>
+                    <a href="{% url 'rezervacije:sinkroniziraj' %}" class="btn-outline-zlatni text-center" style="padding:0.7rem;border-color:rgba(255,255,255,0.3);color:white">
+                        🔄 Sinkroniziraj iCal
+                    </a>
+                    <a href="{% url 'apartman:pocetna' %}" class="btn-outline-zlatni text-center" style="padding:0.7rem;border-color:rgba(255,255,255,0.3);color:white">
+                        🌐 Pogledaj stranicu
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NADOLAZEĆE REZERVACIJE -->
+    <div style="background:white;padding:1.8rem;box-shadow:0 2px 15px rgba(0,0,0,0.06);margin-top:1.5rem">
+        <h5 style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;margin-bottom:1.5rem">
+            Nadolazeće rezervacije (sljedećih 30 dana)
+        </h5>
+        {% if nadolazece %}
+        {% for r in nadolazece %}
+        <div class="rezervacija-red">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div>
+                    <strong>{{ r.ime }} {{ r.prezime }}</strong>
+                    <span style="color:#999;font-size:0.82rem;margin-left:0.8rem">{{ r.drzava }}</span>
+                </div>
+                <div class="d-flex gap-3 align-items-center flex-wrap">
+                    <span style="font-size:0.85rem">
+                        📅 {{ r.datum_dolaska|date:"d.m.Y" }} → {{ r.datum_odlaska|date:"d.m.Y" }}
+                        <span style="color:#999">({{ r.broj_noci }} noći)</span>
+                    </span>
+                    <span style="font-size:0.85rem">👥 {{ r.broj_gostiju }}</span>
+                    <span style="font-size:0.85rem;color:#c9a84c;font-weight:500">{{ r.ukupno }}€</span>
+                    <span class="status-pill" style="background:{% if r.status == 'cekanje' %}#fef3c7;color:#92400e{% elif r.status == 'potvrdjeno' %}#dbeafe;color:#1e40af{% elif r.status == 'placeno' %}#d1fae5;color:#065f46{% else %}#f3f4f6;color:#374151{% endif %}">
+                        {{ r.get_status_display }}
+                    </span>
+                    <a href="/admin/rezervacije/rezervacija/{{ r.pk }}/change/"
+                       style="font-size:0.78rem;color:#c9a84c">Uredi →</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p style="color:#999;text-align:center;padding:2rem">
+            Nema nadolazećih rezervacija u sljedećih 30 dana.
+        </p>
+        {% endif %}
+
+        <div class="text-center mt-3">
+            <a href="/admin/rezervacije/rezervacija/" style="font-size:0.82rem;color:#c9a84c">
+                Sve rezervacije →
+            </a>
+        </div>
+    </div>
+
+</div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const podaci = {{ prihodi_json|safe }};
+const ctx = document.getElementById('prihodiChart').getContext('2d');
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: podaci.map(p => p.mjesec),
+        datasets: [{
+            label: 'Prihodi (€)',
+            data: podaci.map(p => p.prihod),
+            backgroundColor: 'rgba(201, 168, 76, 0.2)',
+            borderColor: '#c9a84c',
+            borderWidth: 2,
+            borderRadius: 0,
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: {
+                beginAtZero: true,
+                grid: { color: '#f0f0f0' },
+                ticks: { callback: v => v + '€' }
+            },
+            x: { grid: { display: false } }
+        }
+    }
+});
+</script>
+{% endblock %}

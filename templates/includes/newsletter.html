@@ -1,0 +1,65 @@
+{% load i18n %}
+<!-- NEWSLETTER WIDGET - Dodaj u footer ili na kraj početne -->
+<section style="background:#1a1a2e;padding:4rem 0;color:white;text-align:center">
+    <div class="container" style="max-width:600px">
+        <p style="font-size:0.75rem;letter-spacing:0.2em;text-transform:uppercase;color:#c9a84c;margin-bottom:1rem">
+            📧 {% trans "Ostani u toku" %}
+        </p>
+        <h2 style="font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;margin-bottom:1rem">
+            {% trans "Pretplati se na newsletter" %}
+        </h2>
+        <p style="color:rgba(255,255,255,0.7);font-size:0.95rem;margin-bottom:2rem">
+            {% trans "Akcije, sezonske ponude i savjeti za odmor u Bihaću." %}
+        </p>
+
+        <form id="newsletter-form" method="post" action="{% url 'marketing:pretplati_se' %}"
+              style="display:flex;gap:0.5rem;max-width:500px;margin:0 auto;flex-wrap:wrap;justify-content:center">
+            {% csrf_token %}
+            <input type="text" name="ime" placeholder="{% trans 'Ime' %}"
+                   style="padding:0.9rem 1rem;border:none;flex:1;min-width:140px;font-family:Jost">
+            <input type="email" name="email" required placeholder="{% trans 'Vaš email' %}"
+                   style="padding:0.9rem 1rem;border:none;flex:2;min-width:200px;font-family:Jost">
+            <button type="submit" class="btn-zlatni" style="padding:0.9rem 2rem">
+                {% trans "Pretplati se" %}
+            </button>
+        </form>
+
+        <p id="newsletter-poruka" style="margin-top:1rem;font-size:0.85rem;display:none"></p>
+
+        <p style="font-size:0.75rem;color:rgba(255,255,255,0.4);margin-top:1.5rem">
+            🔒 {% trans "Vaš email čuvamo sigurno. Možete se otpisati u svakom trenutku." %}
+        </p>
+    </div>
+</section>
+
+<script>
+document.getElementById('newsletter-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const form = e.target;
+    const poruka = document.getElementById('newsletter-poruka');
+
+    try {
+        const formData = new FormData(form);
+        const response = await fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        });
+        const data = await response.json();
+
+        poruka.style.display = 'block';
+        if (data.created) {
+            poruka.style.color = '#10b981';
+            poruka.textContent = '✅ Hvala! Pretplaćeni ste na newsletter.';
+            form.reset();
+        } else {
+            poruka.style.color = '#f59e0b';
+            poruka.textContent = 'Već ste pretplaćeni.';
+        }
+    } catch (err) {
+        poruka.style.display = 'block';
+        poruka.style.color = '#ef4444';
+        poruka.textContent = '❌ Greška, pokušajte ponovo.';
+    }
+});
+</script>

@@ -1,0 +1,251 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-07 22:48+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+#: .\templates\apartman\pocetna.html:3 .\templates\apartman\pocetna.html:12
+#: .\templates\base.html:273
+msgid "Naši apartmani"
+msgstr ""
+
+#: .\templates\apartman\pocetna.html:10
+msgid "Dobrodošli"
+msgstr ""
+
+#: .\templates\apartman\pocetna.html:16
+msgid ""
+"Odaberite svoj savršeni odmor — pažljivo birani apartmani s vrhunskom "
+"uslugom."
+msgstr ""
+
+#: .\templates\apartman\pocetna.html:41
+msgid "od"
+msgstr ""
+
+#: .\templates\apartman\pocetna.html:43
+#: .\templates\rezervacije\rezerviraj.html:86
+msgid "noć"
+msgstr ""
+
+#: .\templates\apartman\pocetna.html:78
+msgid "Pogledaj detalje"
+msgstr ""
+
+#: .\templates\apartman\pocetna.html:87
+msgid "Apartmani uskoro!"
+msgstr ""
+
+#: .\templates\apartman\pocetna.html:88
+msgid "Trenutno radimo na unosu apartmana."
+msgstr ""
+
+#: .\templates\apartman\pocetna.html:99
+msgid "Iskustva gostiju"
+msgstr ""
+
+#: .\templates\apartman\pocetna.html:100
+msgid "Što kažu naši gosti"
+msgstr ""
+
+#: .\templates\base.html:197 .\templates\rezervacije\paypal_placanje.html:25
+msgid "Apartman"
+msgstr ""
+
+#: .\templates\base.html:201
+msgid "Okolica"
+msgstr ""
+
+#: .\templates\base.html:205
+msgid "Mapa"
+msgstr ""
+
+#: .\templates\base.html:209
+msgid "Rezerviraj"
+msgstr ""
+
+#: .\templates\base.html:270
+msgid "Brze veze"
+msgstr ""
+
+#: .\templates\base.html:272
+msgid "Početna"
+msgstr ""
+
+#: .\templates\base.html:274
+msgid "Izleti i restorani"
+msgstr ""
+
+#: .\templates\base.html:275 .\templates\rezervacije\rezerviraj.html:3
+msgid "Rezervacija"
+msgstr ""
+
+#: .\templates\base.html:279
+msgid "Kontakt"
+msgstr ""
+
+#: .\templates\base.html:290
+msgid "Sva prava pridržana"
+msgstr ""
+
+#: .\templates\base.html:298
+msgid "Instalirajte aplikaciju"
+msgstr ""
+
+#: .\templates\base.html:299
+msgid "Brži pristup s vaše početne stranice"
+msgstr ""
+
+#: .\templates\base.html:303
+msgid "Instaliraj"
+msgstr ""
+
+#: .\templates\rezervacije\paypal_placanje.html:3
+msgid "Plaćanje"
+msgstr ""
+
+#: .\templates\rezervacije\paypal_placanje.html:12
+msgid "Sigurno plaćanje"
+msgstr ""
+
+#: .\templates\rezervacije\paypal_placanje.html:13
+msgid "Plaćanje rezervacije"
+msgstr ""
+
+#: .\templates\rezervacije\paypal_placanje.html:20
+msgid "Sažetak rezervacije"
+msgstr ""
+
+#: .\templates\rezervacije\paypal_placanje.html:29
+msgid "Gost"
+msgstr ""
+
+#: .\templates\rezervacije\paypal_placanje.html:33
+msgid "Datumi"
+msgstr ""
+
+#: .\templates\rezervacije\paypal_placanje.html:37
+msgid "Broj noći"
+msgstr ""
+
+#: .\templates\rezervacije\paypal_placanje.html:41
+msgid "Cijena po noći"
+msgstr ""
+
+#: .\templates\rezervacije\paypal_placanje.html:45
+msgid "Ukupno za platiti"
+msgstr ""
+
+#: .\templates\rezervacije\paypal_placanje.html:58
+msgid "Odaberite način plaćanja"
+msgstr ""
+
+#: .\templates\rezervacije\paypal_placanje.html:61
+msgid "Sigurno plaćanje putem PayPal-a — uključuje i kreditne kartice."
+msgstr ""
+
+#: .\templates\rezervacije\paypal_placanje.html:69
+msgid "Vaše podatke o kartici nikad ne pohranjujemo. Plaćanje obrađuje PayPal."
+msgstr ""
+
+#: .\templates\rezervacije\paypal_placanje.html:76
+msgid "Imate problema s plaćanjem?"
+msgstr ""
+
+#: .\templates\rezervacije\paypal_placanje.html:77
+msgid "Kontaktirajte nas"
+msgstr ""
+
+#: .\templates\rezervacije\rezerviraj.html:57
+msgid "Direktna rezervacija"
+msgstr ""
+
+#: .\templates\rezervacije\rezerviraj.html:58
+msgid "Rezervirajte Vaš boravak"
+msgstr ""
+
+#: .\templates\rezervacije\rezerviraj.html:60
+msgid "Bez provizije · Direktno s vlasnikom"
+msgstr ""
+
+#: .\templates\rezervacije\rezerviraj.html:73
+msgid "Odaberite apartman"
+msgstr ""
+
+#: .\templates\rezervacije\rezerviraj.html:96
+msgid "Odaberite termine"
+msgstr ""
+
+#: .\templates\rezervacije\rezerviraj.html:100
+msgid "Datum dolaska"
+msgstr ""
+
+#: .\templates\rezervacije\rezerviraj.html:105
+msgid "Datum odlaska"
+msgstr ""
+
+#: .\templates\rezervacije\rezerviraj.html:110
+msgid "Broj gostiju"
+msgstr ""
+
+#: .\templates\rezervacije\rezerviraj.html:121
+msgid "Vaši podaci"
+msgstr ""
+
+#: .\templates\rezervacije\rezerviraj.html:125
+msgid "Ime"
+msgstr ""
+
+#: .\templates\rezervacije\rezerviraj.html:129
+msgid "Prezime"
+msgstr ""
+
+#: .\templates\rezervacije\rezerviraj.html:133
+msgid "Email adresa"
+msgstr ""
+
+#: .\templates\rezervacije\rezerviraj.html:137
+msgid "Telefon / WhatsApp"
+msgstr ""
+
+#: .\templates\rezervacije\rezerviraj.html:141
+msgid "Država"
+msgstr ""
+
+#: .\templates\rezervacije\rezerviraj.html:145
+msgid "Napomene (opciono)"
+msgstr ""
+
+#: .\templates\rezervacije\rezerviraj.html:151
+msgid "Pošalji upit za rezervaciju"
+msgstr ""
+
+#: .\templates\rezervacije\rezerviraj.html:160
+msgid "Cijena"
+msgstr ""
+
+#: .\templates\rezervacije\rezerviraj.html:164
+msgid "po noći"
+msgstr ""
+
+#: .\templates\rezervacije\rezerviraj.html:168
+msgid "noći"
+msgstr ""
+
+#: .\templates\rezervacije\rezerviraj.html:172
+msgid "Ukupno"
+msgstr ""

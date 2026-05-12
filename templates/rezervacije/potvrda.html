@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Potvrda rezervacije{% endblock %}
+
+{% block content %}
+<div style="min-height:70vh;display:flex;align-items:center;background:#f8f6f0;padding:4rem 0">
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div style="background:white;padding:3rem;text-align:center;box-shadow:0 4px 40px rgba(0,0,0,0.08)">
+                <div style="font-size:4rem;margin-bottom:1rem">✅</div>
+                <p class="section-subtitle">Upit primljen</p>
+                <h1 class="section-title">Hvala, {{ rezervacija.ime }}!</h1>
+                <div class="divider-zlatni"></div>
+
+                <p style="color:#666;line-height:1.8;margin-bottom:2rem">
+                    Vaš upit za rezervaciju je uspješno primljen.<br>
+                    Kontaktirat ćemo Vas na <strong>{{ rezervacija.email }}</strong> u najkraćem roku.
+                </p>
+
+                <!-- Detalji rezervacije -->
+                <div style="background:#f8f6f0;padding:1.5rem;text-align:left;margin-bottom:2rem">
+                    <div class="row g-2" style="font-size:0.9rem">
+                        <div class="col-6">
+                            <span style="color:#999;font-size:0.75rem;letter-spacing:0.1em;text-transform:uppercase">Dolazak</span>
+                            <div style="font-weight:500">{{ rezervacija.datum_dolaska|date:"d.m.Y" }}</div>
+                        </div>
+                        <div class="col-6">
+                            <span style="color:#999;font-size:0.75rem;letter-spacing:0.1em;text-transform:uppercase">Odlazak</span>
+                            <div style="font-weight:500">{{ rezervacija.datum_odlaska|date:"d.m.Y" }}</div>
+                        </div>
+                        <div class="col-6 mt-2">
+                            <span style="color:#999;font-size:0.75rem;letter-spacing:0.1em;text-transform:uppercase">Broj noći</span>
+                            <div style="font-weight:500">{{ rezervacija.broj_noci }}</div>
+                        </div>
+                        <div class="col-6 mt-2">
+                            <span style="color:#999;font-size:0.75rem;letter-spacing:0.1em;text-transform:uppercase">Ukupno</span>
+                            <div style="font-weight:500;color:var(--zlatna)">{{ rezervacija.ukupno }}€</div>
+                        </div>
+                    </div>
+                </div>
+
+                <p style="font-size:0.78rem;color:#aaa;margin-bottom:2rem">
+                    Referentni broj: {{ rezervacija.uuid }}
+                </p>
+
+                <div class="d-flex gap-3 justify-content-center">
+                    <a href="{% url 'apartman:pocetna' %}" class="btn-zlatni">Povratak na početnu</a>
+                    <a href="{% url 'izleti:lista' %}" class="btn-outline-zlatni">Istraži okolicu</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}

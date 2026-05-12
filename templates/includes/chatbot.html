@@ -1,0 +1,205 @@
+{% load i18n %}
+{% if pokazi_chatbot %}
+
+<style>
+.chat-poruka {
+    margin-bottom: 0.8rem;
+    padding: 0.8rem 1rem;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    max-width: 85%;
+    word-wrap: break-word;
+    animation: chatFade 0.3s ease;
+}
+@keyframes chatFade {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.chat-poruka.bot { background: white; color: #333; border: 1px solid #eee; border-bottom-left-radius: 2px; }
+.chat-poruka.korisnik {
+    background: {{ chatbot_postavke.boja_dugmeta }};
+    color: #1a1a2e; margin-left: auto; border-bottom-right-radius: 2px;
+}
+.tipka-anim { display: flex; gap: 0.3rem; padding: 0.5rem; }
+.tipka-anim span {
+    width: 8px; height: 8px;
+    background: {{ chatbot_postavke.boja_dugmeta }};
+    border-radius: 50%; animation: tipka 1.4s infinite;
+}
+.tipka-anim span:nth-child(2) { animation-delay: 0.2s; }
+.tipka-anim span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes tipka {
+    0%, 60%, 100% { opacity: 0.3; }
+    30% { opacity: 1; }
+}
+.sugerirano-pitanje {
+    background: #f8f6f0; border: 1px solid #e0d8c0;
+    color: #555; padding: 0.4rem 0.9rem; border-radius: 20px;
+    font-size: 0.78rem; cursor: pointer; transition: all 0.2s;
+    display: inline-block; margin: 0.2rem;
+}
+.sugerirano-pitanje:hover {
+    background: {{ chatbot_postavke.boja_dugmeta }};
+    color: #1a1a2e; border-color: {{ chatbot_postavke.boja_dugmeta }};
+}
+</style>
+
+{# A: FLOATING DUGME #}
+{% if chatbot_postavke.nacin_prikaza == 'floating' %}
+<div id="chatbot-widget">
+    <button id="chatbot-toggle" onclick="toggleChat()" style="position:fixed;bottom:2rem;right:2rem;width:60px;height:60px;border-radius:50%;background:{{ chatbot_postavke.boja_dugmeta }};color:#1a1a2e;border:none;cursor:pointer;box-shadow:0 4px 20px rgba(201,168,76,0.4);z-index:9998">
+        <span style="font-size:1.8rem">💬</span>
+    </button>
+    <div id="chatbot-window" style="position:fixed;bottom:6.5rem;right:2rem;width:380px;max-width:calc(100vw - 2rem);height:550px;max-height:75vh;background:white;box-shadow:0 10px 40px rgba(0,0,0,0.15);z-index:9999;display:none;flex-direction:column;overflow:hidden">
+        {% include 'includes/chatbot_inner.html' %}
+    </div>
+</div>
+<script>
+function toggleChat() {
+    const w = document.getElementById('chatbot-window');
+    w.style.display = (w.style.display === 'flex') ? 'none' : 'flex';
+}
+</script>
+{% endif %}
+
+{# B: UVIJEK OTVOREN #}
+{% if chatbot_postavke.nacin_prikaza == 'uvijek_otvoren' %}
+<div id="chatbot-uvijek" style="position:fixed;bottom:1.5rem;right:1.5rem;width:360px;height:520px;max-height:70vh;background:white;box-shadow:0 10px 40px rgba(0,0,0,0.15);z-index:9998;display:flex;flex-direction:column;overflow:hidden;border-radius:8px">
+    {% include 'includes/chatbot_inner.html' %}
+</div>
+<style>
+@media (max-width: 768px) {
+    #chatbot-uvijek { bottom:0.5rem !important;right:0.5rem !important;width:calc(100vw - 1rem) !important;height:400px !important; }
+}
+</style>
+{% endif %}
+
+{# C: SEKCIJA NA STRANICI #}
+{% if chatbot_postavke.nacin_prikaza == 'sekcija_pocetna' %}
+<section id="chatbot-sekcija" style="background:linear-gradient(135deg,#1a1a2e 0%,#2d2d44 100%);padding:5rem 0;color:white">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-5">
+                <p style="font-size:0.75rem;letter-spacing:0.2em;text-transform:uppercase;color:{{ chatbot_postavke.boja_dugmeta }};margin-bottom:1rem">
+                    💬 {% trans "Trebate pomoć?" %}
+                </p>
+                <h2 style="font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:300;margin-bottom:1rem;line-height:1.2">
+                    {% trans "Pitajte našeg AI asistenta" %}
+                </h2>
+                <p style="color:rgba(255,255,255,0.7);font-size:1.05rem;line-height:1.7">
+                    {% trans "Dobijte trenutni odgovor na bilo koje pitanje o apartmanima, lokacijama, izletima ili restoranima u okolici." %}
+                </p>
+                <div style="margin-top:1.5rem">
+                    <span style="display:inline-block;background:rgba(201,168,76,0.2);color:{{ chatbot_postavke.boja_dugmeta }};padding:0.4rem 1rem;font-size:0.78rem;margin-right:0.5rem;border-radius:20px">
+                        🟢 {% trans "Online" %}
+                    </span>
+                    <span style="display:inline-block;background:rgba(255,255,255,0.1);color:white;padding:0.4rem 1rem;font-size:0.78rem;border-radius:20px">
+                        🌍 4 {% trans "jezika" %}
+                    </span>
+                </div>
+            </div>
+            <div class="col-lg-7">
+                <div id="chatbot-stranica" style="background:white;color:#333;height:500px;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.3);border-radius:8px;overflow:hidden">
+                    {% include 'includes/chatbot_inner.html' %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{# D: KOMBINACIJA #}
+{% if chatbot_postavke.nacin_prikaza == 'kombinacija' %}
+{% if request.path == '/' or request.path == '/bs/' or request.path == '/en/' or request.path == '/de/' or request.path == '/it/' or request.path == '/hr/' %}
+<section id="chatbot-sekcija" style="background:linear-gradient(135deg,#1a1a2e 0%,#2d2d44 100%);padding:5rem 0;color:white">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-5">
+                <p style="font-size:0.75rem;letter-spacing:0.2em;text-transform:uppercase;color:{{ chatbot_postavke.boja_dugmeta }};margin-bottom:1rem">
+                    💬 {% trans "Trebate pomoć?" %}
+                </p>
+                <h2 style="font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:300;margin-bottom:1rem">
+                    {% trans "Pitajte našeg AI asistenta" %}
+                </h2>
+                <p style="color:rgba(255,255,255,0.7);font-size:1.05rem;line-height:1.7">
+                    {% trans "Dobijte trenutni odgovor o apartmanima, izletima i restoranima." %}
+                </p>
+            </div>
+            <div class="col-lg-7">
+                <div id="chatbot-stranica" style="background:white;color:#333;height:500px;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.3);border-radius:8px;overflow:hidden">
+                    {% include 'includes/chatbot_inner.html' %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% else %}
+<div id="chatbot-widget">
+    <button id="chatbot-toggle" onclick="toggleChat()" style="position:fixed;bottom:2rem;right:2rem;width:60px;height:60px;border-radius:50%;background:{{ chatbot_postavke.boja_dugmeta }};color:#1a1a2e;border:none;cursor:pointer;box-shadow:0 4px 20px rgba(201,168,76,0.4);z-index:9998">
+        <span style="font-size:1.8rem">💬</span>
+    </button>
+    <div id="chatbot-window" style="position:fixed;bottom:6.5rem;right:2rem;width:380px;max-width:calc(100vw - 2rem);height:550px;max-height:75vh;background:white;box-shadow:0 10px 40px rgba(0,0,0,0.15);z-index:9999;display:none;flex-direction:column;overflow:hidden">
+        {% include 'includes/chatbot_inner.html' %}
+    </div>
+</div>
+<script>
+function toggleChat() {
+    const w = document.getElementById('chatbot-window');
+    w.style.display = (w.style.display === 'flex') ? 'none' : 'flex';
+}
+</script>
+{% endif %}
+{% endif %}
+
+{# E: AUTO-OTVORI #}
+{% if chatbot_postavke.nacin_prikaza == 'auto_otvori' %}
+<div id="chatbot-widget">
+    <button id="chatbot-toggle" onclick="toggleChat()" style="position:fixed;bottom:2rem;right:2rem;width:60px;height:60px;border-radius:50%;background:{{ chatbot_postavke.boja_dugmeta }};color:#1a1a2e;border:none;cursor:pointer;box-shadow:0 4px 20px rgba(201,168,76,0.4);z-index:9998;animation:chatPulse 2s infinite">
+        <span style="font-size:1.8rem">💬</span>
+    </button>
+    <div id="chatbot-notif" style="display:none;position:fixed;bottom:6.5rem;right:2rem;background:white;padding:1rem 1.2rem;box-shadow:0 4px 20px rgba(0,0,0,0.15);max-width:280px;z-index:9999;cursor:pointer;border-radius:12px;animation:bounceIn 0.6s">
+        <div onclick="toggleChat()">
+            <strong style="color:#1a1a2e;font-size:0.9rem">👋 {% trans "Trebate pomoć?" %}</strong>
+            <p style="font-size:0.82rem;color:#666;margin:0.3rem 0 0">
+                {% trans "Pitajte našeg AI asistenta — odgovara odmah!" %}
+            </p>
+        </div>
+        <button onclick="zatvoriNotif(event)" style="position:absolute;top:0.5rem;right:0.5rem;background:none;border:none;font-size:1rem;color:#999;cursor:pointer">×</button>
+    </div>
+    <div id="chatbot-window" style="position:fixed;bottom:6.5rem;right:2rem;width:380px;max-width:calc(100vw - 2rem);height:550px;max-height:75vh;background:white;box-shadow:0 10px 40px rgba(0,0,0,0.15);z-index:9999;display:none;flex-direction:column;overflow:hidden">
+        {% include 'includes/chatbot_inner.html' %}
+    </div>
+</div>
+<style>
+@keyframes chatPulse {
+    0%, 100% { box-shadow: 0 4px 20px rgba(201, 168, 76, 0.4); }
+    50% { box-shadow: 0 4px 30px rgba(201, 168, 76, 0.7); }
+}
+@keyframes bounceIn {
+    0% { transform: scale(0.5); opacity: 0; }
+    60% { transform: scale(1.05); opacity: 1; }
+    100% { transform: scale(1); }
+}
+</style>
+<script>
+function toggleChat() {
+    const w = document.getElementById('chatbot-window');
+    w.style.display = (w.style.display === 'flex') ? 'none' : 'flex';
+    document.getElementById('chatbot-notif').style.display = 'none';
+}
+function zatvoriNotif(e) {
+    e.stopPropagation();
+    document.getElementById('chatbot-notif').style.display = 'none';
+    sessionStorage.setItem('chatbot_notif_dismissed', '1');
+}
+setTimeout(() => {
+    if (!sessionStorage.getItem('chatbot_notif_dismissed') &&
+        document.getElementById('chatbot-window').style.display !== 'flex') {
+        document.getElementById('chatbot-notif').style.display = 'block';
+    }
+}, {{ chatbot_postavke.auto_otvori_sekunde|default:10 }} * 1000);
+</script>
+{% endif %}
+
+{% endif %}

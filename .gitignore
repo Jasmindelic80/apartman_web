@@ -1,0 +1,61 @@
+# ===== PYTHON =====
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+*.egg
+
+# ===== DJANGO =====
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+
+# Migrations su BITNE — ostavi ih u Gitu
+# Ne ignoriraj migrations folder!
+
+# ===== ENVIRONMENT =====
+.env
+.env.local
+.env.production
+.venv/
+venv/
+ENV/
+env/
+
+# ===== IDE =====
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ===== OS =====
+desktop.ini
+
+# ===== PROJEKT SPECIFIČNO =====
+# Test/eksperimentalni fajlovi
+*_v2.py
+*_multi.py
+*_novo.py
+*_test.py
+
+# Stari ZIP fajlovi
+*.zip
+
+# Logs
+logs/
+*.log
+
+# Coverage
+.coverage
+htmlcov/
+
+# pytest
+.pytest_cache/

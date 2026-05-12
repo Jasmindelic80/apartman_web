@@ -1,0 +1,284 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{% trans "Rezervacija" %} — {{ apartman.naziv }}{% endblock %}
+
+{% block extra_css %}
+<style>
+.forma-wrap { background: white; padding: 3rem; box-shadow: 0 4px 40px rgba(0,0,0,0.08); }
+.forma-label { font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: #888; margin-bottom: 0.4rem; }
+.forma-input {
+    border: 1px solid #e0e0e0; border-radius: 0; padding: 0.9rem 1rem;
+    font-family: 'Jost', sans-serif; font-size: 0.95rem; width: 100%;
+}
+.forma-input:focus { outline: none; border-color: var(--zlatna); }
+.cijena-box { background: #1a1a2e; color: white; padding: 2rem; position: sticky; top: 100px; }
+
+.apartman-selector {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.8rem;
+    margin-bottom: 2rem;
+}
+.apartman-opcija {
+    border: 2px solid #e0e0e0;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: white;
+}
+.apartman-opcija:hover { border-color: var(--zlatna); }
+.apartman-opcija.aktivna {
+    border-color: var(--zlatna);
+    background: #fff9eb;
+}
+.apartman-opcija .opcija-naziv {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    margin-bottom: 0.3rem;
+}
+.apartman-opcija .opcija-info {
+    font-size: 0.78rem;
+    color: #888;
+}
+.apartman-opcija .opcija-cijena {
+    font-size: 1.05rem;
+    color: var(--zlatna);
+    font-weight: 500;
+    margin-top: 0.5rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div style="background:#f8f6f0;padding:5rem 0">
+<div class="container">
+    <div class="text-center mb-5">
+        <p class="section-subtitle">{% trans "Direktna rezervacija" %}</p>
+        <h1 class="section-title">{% trans "Rezervirajte Vaš boravak" %}</h1>
+        <div class="divider-zlatni"></div>
+        <p style="color:#888;font-size:0.9rem">{% trans "Bez provizije · Direktno s vlasnikom" %}</p>
+    </div>
+
+    <div class="row g-5">
+        <!-- FORMA -->
+        <div class="col-lg-8">
+            <div class="forma-wrap">
+                <form method="post" id="rezervacija-forma">
+                    {% csrf_token %}
+
+                    <!-- IZBOR APARTMANA -->
+                    {% if svi_apartmani.count > 1 %}
+                    <h5 style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid #eee">
+                        🏠 {% trans "Odaberite apartman" %}
+                    </h5>
+                    <input type="hidden" name="apartman_id" id="apartman_id" value="{{ apartman.pk }}">
+                    <div class="apartman-selector">
+                        {% for ap in svi_apartmani %}
+                        <div class="apartman-opcija {% if ap.pk == apartman.pk %}aktivna{% endif %}"
+                             data-id="{{ ap.pk }}"
+                             data-cijena="{{ ap.cijena_po_noci }}"
+                             data-min="{{ ap.minimalni_boravak }}"
+                             data-kapacitet="{{ ap.kapacitet }}"
+                             onclick="odaberiApartman(this)">
+                            <div class="opcija-naziv">{{ ap.naziv }}</div>
+                            <div class="opcija-info">👥 {{ ap.kapacitet }} · 🛏️ {{ ap.spavace_sobe }} · 🚿 {{ ap.kupaonice }}</div>
+                            <div class="opcija-cijena">{{ ap.cijena_po_noci }}€/{% trans "noć" %}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <input type="hidden" name="apartman_id" value="{{ apartman.pk }}">
+                    {% endif %}
+
+                    <!-- DATUMI -->
+                    <h5 style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid #eee">
+                        📅 {% trans "Odaberite termine" %}
+                    </h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="forma-label">{% trans "Datum dolaska" %}</label>
+                            <input type="text" name="datum_dolaska" id="datum_dolaska"
+                                   class="forma-input flatpickr" placeholder="DD.MM.GGGG" required readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="forma-label">{% trans "Datum odlaska" %}</label>
+                            <input type="text" name="datum_odlaska" id="datum_odlaska"
+                                   class="forma-input flatpickr" placeholder="DD.MM.GGGG" required readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="forma-label">{% trans "Broj gostiju" %}</label>
+                            <select name="broj_gostiju" class="forma-input" id="broj_gostiju">
+                                {% for i in "12345678" %}
+                                <option value="{{ forloop.counter }}">{{ forloop.counter }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- PODACI -->
+                    <h5 style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid #eee">
+                        👤 {% trans "Vaši podaci" %}
+                    </h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="forma-label">{% trans "Ime" %}</label>
+                            <input type="text" name="ime" class="forma-input" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="forma-label">{% trans "Prezime" %}</label>
+                            <input type="text" name="prezime" class="forma-input" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="forma-label">{% trans "Email adresa" %}</label>
+                            <input type="email" name="email" class="forma-input" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="forma-label">{% trans "Telefon / WhatsApp" %}</label>
+                            <input type="tel" name="telefon" class="forma-input" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="forma-label">{% trans "Država" %}</label>
+                            <input type="text" name="drzava" class="forma-input">
+                        </div>
+                        <div class="col-12">
+                            <label class="forma-label">{% trans "Napomene (opciono)" %}</label>
+                            <textarea name="napomene" class="forma-input" rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-zlatni w-100" style="padding:1.2rem">
+                        {% trans "Pošalji upit za rezervaciju" %}
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- SIDEBAR -->
+        <div class="col-lg-4">
+            <div class="cijena-box">
+                <p style="color:#c9a84c;font-size:0.75rem;letter-spacing:0.2em;text-transform:uppercase">{% trans "Cijena" %}</p>
+                <div id="cijena-prikaz" style="font-family:'Cormorant Garamond',serif;font-size:3rem;color:white;line-height:1">
+                    {{ apartman.cijena_po_noci }}€
+                </div>
+                <p id="cijena-label" style="color:rgba(255,255,255,0.5);font-size:0.82rem;margin-bottom:2rem">{% trans "po noći" %}</p>
+
+                <div id="cijena-racun" style="display:none;border-top:1px solid rgba(255,255,255,0.1);padding-top:1.5rem">
+                    <div class="d-flex justify-content-between mb-2" style="font-size:0.85rem;color:rgba(255,255,255,0.7)">
+                        <span><span id="cijena-noc">{{ apartman.cijena_po_noci }}</span>€ × <span id="broj-noci">0</span> {% trans "noći" %}</span>
+                        <span id="medjuzbroj">0€</span>
+                    </div>
+                    <div class="d-flex justify-content-between" style="font-size:1.1rem;color:white;border-top:1px solid rgba(255,255,255,0.2);padding-top:1rem;margin-top:0.5rem">
+                        <strong>{% trans "Ukupno" %}</strong>
+                        <strong id="ukupno" style="color:#c9a84c">0€</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let cijenaPoNoci = {{ apartman.cijena_po_noci }};
+let zauzetiTermini = {{ zauzeti_json|safe }};
+let minimalniBoravak = {{ apartman.minimalni_boravak }};
+let kapacitet = {{ apartman.kapacitet }};
+
+// Pripremi zauzete datume
+function pripremZauzete(termini) {
+    const datumi = [];
+    termini.forEach(t => {
+        let od = new Date(t.od);
+        let do_ = new Date(t.do);
+        while (od < do_) {
+            datumi.push(new Date(od));
+            od.setDate(od.getDate() + 1);
+        }
+    });
+    return datumi;
+}
+
+let fpDolazak, fpOdlazak;
+
+function inicijalizirajKalendar() {
+    const zauzetoDatumi = pripremZauzete(zauzetiTermini);
+
+    if (fpDolazak) fpDolazak.destroy();
+    if (fpOdlazak) fpOdlazak.destroy();
+
+    fpDolazak = flatpickr("#datum_dolaska", {
+        dateFormat: "Y-m-d",
+        altInput: true,
+        altFormat: "d.m.Y",
+        minDate: "today",
+        disable: zauzetoDatumi,
+        onChange: function(selectedDates) {
+            if (selectedDates.length > 0) {
+                let minOdlazak = new Date(selectedDates[0]);
+                minOdlazak.setDate(minOdlazak.getDate() + minimalniBoravak);
+                fpOdlazak.set('minDate', minOdlazak);
+                fpOdlazak.open();
+            }
+        }
+    });
+
+    fpOdlazak = flatpickr("#datum_odlaska", {
+        dateFormat: "Y-m-d",
+        altInput: true,
+        altFormat: "d.m.Y",
+        disable: zauzetoDatumi,
+        onChange: izracunajCijenu
+    });
+}
+
+inicijalizirajKalendar();
+
+// Promjena apartmana
+function odaberiApartman(el) {
+    document.querySelectorAll('.apartman-opcija').forEach(o => o.classList.remove('aktivna'));
+    el.classList.add('aktivna');
+
+    const apartmanId = el.dataset.id;
+    cijenaPoNoci = parseFloat(el.dataset.cijena);
+    minimalniBoravak = parseInt(el.dataset.min);
+    kapacitet = parseInt(el.dataset.kapacitet);
+
+    document.getElementById('apartman_id').value = apartmanId;
+    document.getElementById('cijena-prikaz').textContent = cijenaPoNoci + '€';
+    document.getElementById('cijena-noc').textContent = cijenaPoNoci;
+
+    // Reset kapacitet dropdown
+    const select = document.getElementById('broj_gostiju');
+    select.innerHTML = '';
+    for (let i = 1; i <= kapacitet; i++) {
+        select.innerHTML += `<option value="${i}">${i}</option>`;
+    }
+
+    // Dohvati nove zauzete termine
+    fetch(`/rezervacije/api/dostupnost/${apartmanId}/`)
+        .then(r => r.json())
+        .then(data => {
+            zauzetiTermini = data.zauzeto;
+            inicijalizirajKalendar();
+            izracunajCijenu();
+        });
+}
+
+function izracunajCijenu() {
+    if (!fpDolazak.selectedDates[0] || !fpOdlazak.selectedDates[0]) return;
+    const od = fpDolazak.selectedDates[0];
+    const do_ = fpOdlazak.selectedDates[0];
+    const noci = Math.round((do_ - od) / (1000 * 60 * 60 * 24));
+    const ukupno = noci * cijenaPoNoci;
+
+    document.getElementById('broj-noci').textContent = noci;
+    document.getElementById('medjuzbroj').textContent = ukupno + '€';
+    document.getElementById('ukupno').textContent = ukupno + '€';
+    document.getElementById('cijena-racun').style.display = 'block';
+}
+</script>
+{% endblock %}
